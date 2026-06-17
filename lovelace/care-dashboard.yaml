@@ -1,0 +1,102 @@
+# Care + Home Status Dashboard for Home Assistant
+# Matches the 'glowing command center' visualization
+# Add via: Settings > Dashboards > Add Dashboard > YAML mode
+# Requires: card-mod, mushroom cards (install via HACS)
+
+title: Home Command
+views:
+  - title: Overview
+    path: overview
+    icon: mdi:home-heart
+    cards:
+
+      # ── CARE ROOM (Cheryl) ─────────────────────────────────────────
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: Care Room - Cheryl
+            subtitle: "{{ now().strftime('%H:%M') }}"
+
+          - type: glance
+            title: Vitals
+            entities:
+              - entity: sensor.cheryl_bp_systolic
+                name: SYS
+                icon: mdi:heart-pulse
+              - entity: sensor.cheryl_bp_diastolic
+                name: DIA
+              - entity: sensor.cheryl_room_temperature
+                name: Temp
+              - entity: sensor.cheryl_room_humidity
+                name: Humidity
+              - entity: binary_sensor.cheryl_room_motion
+                name: Motion
+
+          - type: custom:mushroom-entity-card
+            entity: binary_sensor.cheryl_room_motion
+            name: Cheryl Motion
+            icon: mdi:motion-sensor
+            tap_action:
+              action: more-info
+
+          - type: history-graph
+            title: Motion History (12h)
+            entities:
+              - entity: binary_sensor.cheryl_room_motion
+            hours_to_show: 12
+
+      # ── SYSTEM STATUS ──────────────────────────────────────────────
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: System Status
+
+          - type: glance
+            entities:
+              - entity: sensor.home_status_server
+                name: Dashboard
+                icon: mdi:monitor-dashboard
+              - entity: sensor.n8n_status
+                name: n8n
+                icon: mdi:workflow
+              - entity: sensor.tailscale_status
+                name: Tailscale
+                icon: mdi:vpn
+              - entity: sensor.ha_cloud_status
+                name: Cloud
+                icon: mdi:cloud-check
+
+      # ── ENERGY OVERVIEW ────────────────────────────────────────────
+      - type: energy-distribution
+        title: Energy
+
+      # ── PETS / SMARTTHINGS TAGS ───────────────────────────────────
+      - type: glance
+        title: Pets
+        entities:
+          - entity: device_tracker.buddy_tag
+            name: Buddy
+            icon: mdi:dog
+          - entity: device_tracker.holly_tag
+            name: Holly
+            icon: mdi:cat
+
+      # ── NETWORK MAP ────────────────────────────────────────────────
+      - type: custom:mushroom-title-card
+        title: Tailscale Network
+
+      - type: entities
+        title: Connected Devices
+        entities:
+          - entity: sensor.tailscale_imac
+            name: iMac (Cashiess-iMac)
+            icon: mdi:desktop-mac
+          - entity: sensor.tailscale_jetson
+            name: Jetson
+            icon: mdi:chip
+          - entity: sensor.tailscale_pi
+            name: Raspberry Pi
+            icon: mdi:raspberry-pi
+          - entity: sensor.tailscale_macbook
+            name: MacBook (Agent Node)
+            icon: mdi:laptop

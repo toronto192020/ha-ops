@@ -1,0 +1,27 @@
+# Paste into HA automations.yaml or import via UI
+# Auto-reconnects Nabu Casa cloud after HA restart
+
+- alias: "Reconnect Cloud on HA Start"
+  description: "Waits 60s after HA boots then forces Nabu Casa reconnect"
+  trigger:
+    - platform: homeassistant
+      event: start
+  action:
+    - delay: "00:01:00"
+    - service: cloud.remote_connect
+  mode: single
+
+- alias: "Alert if Nabu Casa Disconnects"
+  description: "Notifies if cloud remote access goes offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.remote_ui
+      to: "off"
+      for:
+        minutes: 5
+  action:
+    - service: notify.mobile_app
+      data:
+        title: "HA Cloud Disconnected"
+        message: "Nabu Casa remote access is offline. Check Settings > Cloud."
+  mode: single
